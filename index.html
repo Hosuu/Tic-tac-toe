@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <title>Tic tac toe</title>
+</head>
+<body>
+    <app>
+        <div class="scoreboard">
+            <i id="crown-icon" class="fas fa-crown"></i>
+            <i id="user-icon" class="fas fa-smile" onclick="changeMood()"></i><!-- fa-frown ALTERNATIVE -->
+            <i id="comp-icon" class="fas fa-robot"></i>
+            <i id="turn-icon" class="fas fa-hand-point-up"></i>
+            <span id="user-score">0</span>:<span id="comp-score">0</span>
+        </div>
+
+        <div class="play-field">
+
+            <div id="win-dash"></div>
+
+            <div class="row">
+                <div class="field" id="f0" onclick="move(0)"></div>
+                <div class="field" id="f1" onclick="move(1)"></div>
+                <div class="field" id="f2" onclick="move(2)"></div>
+            </div>
+            <div class="row">
+                <div class="field" id="f3" onclick="move(3)"></div>
+                <div class="field" id="f4" onclick="move(4)"></div>
+                <div class="field" id="f5" onclick="move(5)"></div>
+            </div>
+
+            <div class="row">
+                <div class="field" id="f6" onclick="move(6)"></div>
+                <div class="field" id="f7" onclick="move(7)"></div>
+                <div class="field" id="f8" onclick="move(8)"></div>
+            </div>
+    
+        </div>
+
+    </app>
+
+    <script>
+        debugger;
+
+        score={
+            user: 0,
+            comp: 0,
+        }
+
+        const dash = $('#win-dash')
+
+        var field = new Array(9);
+        reloadFields();
+
+        //Turn 1 - user | 2 - comp
+        var turn = Math.floor(Math.random()*2)+1; 
+
+        function move(move)
+        {
+            if(turn == 0 || checkDraw())
+            {
+                dash.css("width","0px");
+                turn = Math.floor(Math.random()*2)+1;
+                reloadFields();
+                return;
+            }
+
+            checkDraw();
+
+            if(field[move].value == 0)
+            {
+                field[move].value = turn;
+                field[move].element.addClass("taken");
+                if(turn == 1)
+                    field[move].element.html('<i class="far fa-circle"></i>');
+                else
+                    field[move].element.html('<i class="fas fa-times"></i>');
+
+                if(checkWin())
+                {
+                    dash.css("width","380px");
+
+                    if(turn==1)
+                        score.user++;
+                    else
+                        score.comp++;
+                    updateScore();
+                    
+                    return turn = 0;
+                }
+
+                turn++;
+                if(turn==3)turn=1;
+                updateScore();
+            }  
+        }
+
+        function checkWin()
+        {
+            //ROWS
+            /*  
+                x x x
+                o o o
+                o o o 
+            */
+            if(field[0].value == field[1].value && field[1].value == field[2].value && field[0].value > 0)
+            {
+                dash.css("transform", "translateY(50px)")
+                return true;
+            }
+            /* 
+                o o o
+                x x x
+                o o o 
+            */ 
+            if(field[3].value == field[4].value && field[4].value == field[5].value && field[3].value > 0)
+            {
+                dash.css("transform", "translateY(185px)")
+                return true;
+            }
+            /*  
+                o o o
+                o o o
+                x x x 
+            */ 
+            if(field[6].value == field[7].value && field[7].value == field[8].value && field[6].value > 0)
+            {
+                dash.css("transform", "translateY(320px)")
+                return true;
+            }
+
+            //COLUMNS
+            /*  
+                x o o
+                x o o
+                x o o 
+            */ 
+            if(field[0].value == field[3].value && field[3].value == field[6].value && field[0].value > 0)
+            {
+                dash.css("transform", "translatex(55px) rotate(90deg)")
+                return true;
+            }
+            /*  
+                o x o
+                o x o
+                o x o 
+            */ 
+            if(field[1].value == field[4].value && field[4].value == field[7].value && field[1].value > 0)
+            {
+                dash.css("transform", "translatex(190px) rotate(90deg)")
+                return true;
+            }
+            /*  
+                o o x
+                o o x
+                o o x 
+            */ 
+            if(field[2].value == field[5].value && field[5].value == field[8].value && field[2].value > 0)
+            {
+                dash.css("transform", "translatex(325px) rotate(90deg)")
+                return true;
+            }
+
+            //CROSS
+            /*  
+                x o o
+                o x o
+                o o x 
+            */ 
+            if(field[0].value == field[4].value && field[4].value == field[8].value && field[0].value > 0)
+            {
+                dash.css("transform", "rotate(45deg) scaleX(1.41)")
+                return true;
+            }
+            /*  
+                o o x
+                o x o
+                x o o 
+            */ 
+            if(field[2].value == field[4].value && field[4].value == field[6].value && field[2].value > 0)
+            {
+                dash.css("transform", "translateX(380px) rotate(135deg) scaleX(1.41)")
+                return true;
+            }
+
+            return false;
+        }
+
+        function checkDraw(){
+            for (let i = 0; i <= 8; i++)
+            {
+                if(field[i].value == 0)
+                return false;
+            }
+            return true;
+        }
+
+        function updateScore()
+        {
+            // CROWN POSITION //
+            let crown = $('#crown-icon');
+            if(score.user==score.comp) crown.css("left","50%");
+            else 
+            if(score.user>score.comp) crown.css("left","0%");
+            else 
+            crown.css("left","100%");
+
+            // TURN HIGHLIGHT //
+            if(turn == 1)
+            {
+                $('#user-icon').addClass('turn-highlight');
+                $('#turn-icon').css("transform", "translateX(-300px) rotate(45deg) scaleX(-1)")
+                $('#comp-icon').removeClass('turn-highlight');
+            }
+            else
+            {
+                $('#comp-icon').addClass('turn-highlight');
+                $('#turn-icon').css("transform", "translateX(260px) rotate(-45deg) scaleX(1)")
+                $('#user-icon').removeClass('turn-highlight');
+            }
+                
+
+            // DISPLAY SCORE //
+            $('#user-score').html(score.user);
+            $('#comp-score').html(score.comp);
+        }
+        
+        function reloadFields()
+        {
+            for (let i = 0; i <= 8; i++) 
+            {
+                field[i]={element: $(`#f${i}`), value: 0,};    
+                field[i].element.removeClass("taken");
+            }
+            updateScore();
+        }
+
+        function changeMood(){
+            let obj = $('#user-icon');
+
+            if(obj.hasClass('fa-smile'))
+            {
+                obj.fadeOut(200);
+                setTimeout(()=>{
+                    obj.addClass("fa-frown");
+                    obj.removeClass('fa-smile');
+                    obj.fadeIn(200);
+                },200);
+            }
+            else
+            {
+                obj.fadeOut(200);
+                setTimeout(()=>{
+                    obj.addClass("fa-smile");
+                    obj.removeClass('fa-frown');
+                    obj.fadeIn(200);
+                },200);
+            }
+        }
+
+        function scaleApp()
+        {
+            let scale = $(window).height()/640;
+            $('app').css("zoom", scale);
+        }
+
+        $(window).resize(()=>{scaleApp()})
+        scaleApp();
+        updateScore();
+    </script>
+</body>
+</html>
